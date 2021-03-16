@@ -1,24 +1,13 @@
 import { useReducer, useState } from "react";
-
-const ADD = "add";
-const initState = {
-  todos: []
-}
-const todoReducer = (state, actions) => {
-  switch (actions.type) {
-    case ADD:
-      return { todos: [...state.todos, { text: actions.paylaod }] }
-    default:
-      return new Error();
-  }
-}
+import todoReducer, { ADD, COMPLETE, DEL, initState, UNCOMPLETE } from "./todoReducer";
 
 function App() {
   const [state, dispatch] = useReducer(todoReducer, initState)
   const [newTodo, setNewTodo] = useState("");
   const onSubmit = (event) => {
     event.preventDefault();
-    dispatch({ type: ADD, paylaod: newTodo })
+    dispatch({ type: ADD, payload: newTodo })
+    setNewTodo("")
   }
   const onChange = (event) => {
     const { target: { value } } = event;
@@ -37,10 +26,31 @@ function App() {
       </form>
       <h2>Todos</h2>
       <ul>
-        {state.todos.map((todo, idx) => {
-          return <li key={idx}>{todo.text}</li>
+        {state.todos.map((todo) => {
+          return (
+            <li key={todo.id}>
+              <span>{todo.text}</span>
+              <button onClick={() => dispatch({ type: DEL, payload: todo.id })}>❌</button>
+              <button onClick={() => dispatch({ type: COMPLETE, payload: todo.id })}>✅</button>
+            </li>
+          )
         })}
       </ul>
+      {state.completed.length >= 0 && state.completed.map((todo) => {
+        return (
+          <>
+            <h2>Completed</h2>
+            <ul>
+              <li key={todo.id}>
+                <span>{todo.text}</span>
+                <button onClick={() => dispatch({ type: DEL, payload: todo.id })}>❌</button>
+                <button onClick={() => dispatch({ type: UNCOMPLETE, payload: todo.id })}> ❗ </button>
+              </li>
+
+            </ul>
+          </>
+        )
+      })}
     </div>
   );
 }
