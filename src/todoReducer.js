@@ -1,9 +1,6 @@
 import { v4 as uuidv4 } from "uuid"
+import { ADD, DEL, COMPLETE, UNCOMPLETE, EDIT } from "./todoActions"
 
-export const ADD = "add";
-export const DEL = 'del';
-export const COMPLETE = 'complete';
-export const UNCOMPLETE = 'uncomplete';
 export const initState = {
     todos: [],
     completed: []
@@ -11,10 +8,15 @@ export const initState = {
 const todoReducer = (state, actions) => {
     switch (actions.type) {
         case ADD:
-            return { ...state, todos: [...state.todos, { text: actions.payload, id: uuidv4() }] }
+            return {
+                ...state,
+                todos: [...state.todos, { text: actions.payload, id: uuidv4() }]
+            }
         case DEL:
             return {
-                ...state, todos: state.todos.filter((todo) => todo.id !== actions.payload)
+                ...state,
+                todos: state.todos.filter((todo) => todo.id !== actions.payload),
+                completed: state.completed.filter((todo) => todo.id !== actions.payload)
             }
         case COMPLETE:
             const CtoU = state.todos.find(todo => todo.id === actions.payload)
@@ -30,8 +32,10 @@ const todoReducer = (state, actions) => {
                 completed: state.completed.filter(todo => todo.id !== actions.payload),
                 todos: [...state.todos, { ...UtoC }]
             };
+        case EDIT:
+            return;
         default:
-            return new Error();
+            throw new Error();
     }
 }
 

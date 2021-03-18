@@ -1,56 +1,25 @@
-import { useReducer, useState } from "react";
-import todoReducer, { ADD, COMPLETE, DEL, initState, UNCOMPLETE } from "./todoReducer";
+import React from "react";
+import Add from "./components/Add"
+import List from "./components/List";
+import Todo from "./components/Todo";
+import { useTodoState } from "./todoContext";
 
-function App() {
-  const [state, dispatch] = useReducer(todoReducer, initState)
-  const [newTodo, setNewTodo] = useState("");
-  const onSubmit = (event) => {
-    event.preventDefault();
-    dispatch({ type: ADD, payload: newTodo })
-    setNewTodo("")
-  }
-  const onChange = (event) => {
-    const { target: { value } } = event;
-    setNewTodo(value)
-  }
+const App = () => {
+  const { todos, completed } = useTodoState();
   return (
     <div className="App">
       <h1>Add a Todo</h1>
-      <form onSubmit={onSubmit}>
-        <input
-          value={newTodo}
-          type='text'
-          placeholder="Write to todo"
-          onChange={onChange}
-        />
-      </form>
-      <h2>Todos</h2>
-      <ul>
-        {state.todos.map((todo) => {
-          return (
-            <li key={todo.id}>
-              <span>{todo.text}</span>
-              <button onClick={() => dispatch({ type: DEL, payload: todo.id })}>❌</button>
-              <button onClick={() => dispatch({ type: COMPLETE, payload: todo.id })}>✅</button>
-            </li>
-          )
-        })}
-      </ul>
-      {state.completed.length >= 0 && state.completed.map((todo) => {
-        return (
-          <>
-            <h2>Completed</h2>
-            <ul>
-              <li key={todo.id}>
-                <span>{todo.text}</span>
-                <button onClick={() => dispatch({ type: DEL, payload: todo.id })}>❌</button>
-                <button onClick={() => dispatch({ type: UNCOMPLETE, payload: todo.id })}> ❗ </button>
-              </li>
-
-            </ul>
-          </>
-        )
-      })}
+      <Add />
+      <List name="Todo">
+        {todos.map(todo => (
+          <Todo key={todo.id} id={todo.id} text={todo.text} isCompleted={false} />
+        ))}
+      </List>
+      {completed.length > 0 && <List name="Complete">
+        {completed.map(todo => (
+          <Todo key={todo.id} id={todo.id} text={todo.text} isCompleted={true} />
+        ))}
+      </List>}
     </div>
   );
 }
